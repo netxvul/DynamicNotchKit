@@ -68,6 +68,9 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     /// Namespace for matched geometry effect. It is automatically generated if `nil` when the notch is first presented.
     @Published public internal(set) var namespace: Namespace.ID?
 
+    /// Configuration for customizing transition animations and behavior.
+    public var transitionConfiguration = DynamicNotchTransitionConfiguration()
+
     /// Content
     let expandedContent: Expanded
     let compactLeadingContent: CompactLeading
@@ -79,7 +82,7 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     @Published private(set) var state: DynamicNotchState = .hidden
     @Published private(set) var notchSize: CGSize = .zero
     @Published private(set) var menubarHeight: CGFloat = 0
-    @Published private(set) var isHovering: Bool = false
+    @Published public private(set) var isHovering: Bool = false
 
     private var closePanelTask: Task<(), Never>? // Used to close the panel after hiding completes
 
@@ -128,6 +131,15 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
         self.disableCompactTrailing = true
     }
 
+    /// Resolves the effective opening animation (custom override or style default).
+    var effectiveOpeningAnimation: Animation { transitionConfiguration.openingAnimation ?? style.openingAnimation }
+
+    /// Resolves the effective closing animation (custom override or style default).
+    var effectiveClosingAnimation: Animation { transitionConfiguration.closingAnimation ?? style.closingAnimation }
+
+    /// Resolves the effective conversion animation (custom override or style default).
+    var effectiveConversionAnimation: Animation { transitionConfiguration.conversionAnimation ?? style.conversionAnimation }
+
     /// Observes screen parameters changes and re-initializes the window if necessary.
     private func observeScreenParameters() {
         Task {
@@ -159,7 +171,7 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
 
 extension DynamicNotch {
     public func expand(on screen: NSScreen = NSScreen.screens[0]) async {
-        await _expand(on: screen, skipHide: false)
+        await _expand(on: screen, skipHide: transitionConfiguration.skipIntermediateHides)
     }
 
     func _expand(on screen: NSScreen = NSScreen.screens[0], skipHide: Bool) async {
@@ -174,7 +186,7 @@ extension DynamicNotch {
             initializeWindow(screen: screen, orderFront: false)
 
             // Start animation BEFORE showing window - this eliminates stutter
-            withAnimation(style.openingAnimation) {
+            withAnimation(effectiveOpeningAnimation) {
                 self.state = .expanded
             }
 
@@ -184,7 +196,7 @@ extension DynamicNotch {
             // Window exists and we're transitioning from compact state
             Task { @MainActor in
                 if !skipHide {
-                    withAnimation(style.closingAnimation) {
+                    withAnimation(effectiveClosingAnimation) {
                         self.state = .hidden
                     }
 
@@ -193,7 +205,7 @@ extension DynamicNotch {
                     try? await Task.sleep(for: .seconds(0.25))
                 }
 
-                withAnimation(style.conversionAnimation) {
+                withAnimation(effectiveConversionAnimation) {
                     self.state = .expanded
                 }
             }
@@ -205,7 +217,7 @@ extension DynamicNotch {
     }
 
     public func compact(on screen: NSScreen = NSScreen.screens[0]) async {
-        await _compact(on: screen, skipHide: false)
+        await _compact(on: screen, skipHide: transitionConfiguration.skipIntermediateHides)
     }
 
     func _compact(on screen: NSScreen = NSScreen.screens[0], skipHide: Bool) async {
@@ -230,7 +242,7 @@ extension DynamicNotch {
             initializeWindow(screen: screen, orderFront: false)
 
             // Start animation BEFORE showing window - this eliminates stutter
-            withAnimation(style.openingAnimation) {
+            withAnimation(effectiveOpeningAnimation) {
                 self.state = .compact
             }
 
@@ -240,7 +252,7 @@ extension DynamicNotch {
             // Window exists and we're transitioning from expanded state
             Task { @MainActor in
                 if !skipHide {
-                    withAnimation(style.closingAnimation) {
+                    withAnimation(effectiveClosingAnimation) {
                         self.state = .hidden
                     }
 
@@ -249,7 +261,7 @@ extension DynamicNotch {
                     guard self.state == .hidden else { return }
                 }
 
-                withAnimation(style.conversionAnimation) {
+                withAnimation(effectiveConversionAnimation) {
                     self.state = .compact
                 }
             }
@@ -283,7 +295,7 @@ extension DynamicNotch {
             return
         }
 
-        withAnimation(style.closingAnimation) {
+        withAnimation(effectiveClosingAnimation) {
             state = .hidden
             isHovering = false
         }
