@@ -18,6 +18,7 @@ struct NotchContentView<Expanded, CompactLeading, CompactTrailing>: View where E
     }
 
     private var shadowOpacity: CGFloat {
+        guard !style.isFloating else { return 0 }
         if dynamicNotch.hoverBehavior.contains(.increaseShadow), dynamicNotch.isHovering {
             0.8
         } else if dynamicNotch.state != .expanded {
