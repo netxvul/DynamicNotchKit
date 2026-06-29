@@ -10,7 +10,7 @@ import SwiftUI
 struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expanded: View, CompactLeading: View, CompactTrailing: View {
     @ObservedObject private var dynamicNotch: DynamicNotch<Expanded, CompactLeading, CompactTrailing>
     @State private var windowHeight: CGFloat = 0
-    private let safeAreaInset: CGFloat = 6
+    private let safeAreaInset: CGFloat = 15
 
     init(dynamicNotch: DynamicNotch<Expanded, CompactLeading, CompactTrailing>) {
         self.dynamicNotch = dynamicNotch
@@ -30,10 +30,11 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
                 VisualEffectView(material: .popover, blendingMode: .behindWindow)
                     .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(.quaternary, lineWidth: 1)
                     }
             }
             .clipShape(.rect(cornerRadius: cornerRadius))
-            .padding(10)
+            .padding(20)
             .onGeometryChange(for: CGFloat.self, of: \.size.height) { newHeight in
                 // This makes sure that the floating window FULLY slides off before disappearing
                 windowHeight = newHeight
