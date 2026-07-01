@@ -71,6 +71,10 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     /// Configuration for customizing transition animations and behavior.
     public var transitionConfiguration = DynamicNotchTransitionConfiguration()
 
+    /// Optional custom panel origin Y. When set, overrides the default
+    /// top-of-screen positioning in initializeWindow.
+    public var customPanelOriginY: CGFloat? = nil
+
     /// Content
     let expandedContent: Expanded
     let compactLeadingContent: CompactLeading
@@ -371,7 +375,7 @@ private extension DynamicNotch {
         )
         let origin = NSPoint(
             x: screen.frame.midX - (size.width / 2),
-            y: screen.frame.maxY - size.height
+            y: customPanelOriginY ?? (screen.frame.maxY - size.height)
         )
 
         panel.setFrame(
