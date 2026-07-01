@@ -38,6 +38,7 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
                 VisualEffectView(material: .popover, blendingMode: .behindWindow)
                     .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(.clear, lineWidth: 0)
                     }
             }
             .clipShape(.rect(cornerRadius: cornerRadius))
