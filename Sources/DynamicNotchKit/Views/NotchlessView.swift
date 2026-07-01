@@ -27,7 +27,7 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
     private var hiddenOffset: CGFloat {
         switch dynamicNotch.expandDirection {
         case .fromTop:    return -windowHeight
-        case .fade:       return 0
+        case .fade:       return dynamicNotch.notchSize.height
         case .fromBottom: return windowHeight
         }
     }
