@@ -71,6 +71,10 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     /// Configuration for customizing transition animations and behavior.
     public var transitionConfiguration = DynamicNotchTransitionConfiguration()
 
+    /// Direction from which the floating pill animates in.
+    public enum ExpandDirection { case fromTop, fade, fromBottom }
+    public var expandDirection: ExpandDirection = .fromTop
+
     /// Optional custom panel origin Y. When set, overrides the default
     /// top-of-screen positioning in initializeWindow.
     public var customPanelOriginY: CGFloat? = nil

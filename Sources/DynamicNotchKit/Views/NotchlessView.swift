@@ -10,7 +10,7 @@ import SwiftUI
 struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expanded: View, CompactLeading: View, CompactTrailing: View {
     @ObservedObject private var dynamicNotch: DynamicNotch<Expanded, CompactLeading, CompactTrailing>
     @State private var windowHeight: CGFloat = 0
-    private let safeAreaInset: CGFloat = 15
+    private let safeAreaInset: CGFloat = 2
 
     init(dynamicNotch: DynamicNotch<Expanded, CompactLeading, CompactTrailing>) {
         self.dynamicNotch = dynamicNotch
@@ -21,6 +21,14 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
             cornerRadius
         } else {
             20
+        }
+    }
+
+    private var hiddenOffset: CGFloat {
+        switch dynamicNotch.expandDirection {
+        case .fromTop:    return -windowHeight
+        case .fade:       return 0
+        case .fromBottom: return windowHeight
         }
     }
 
@@ -39,7 +47,7 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
                 // This makes sure that the floating window FULLY slides off before disappearing
                 windowHeight = newHeight
             }
-            .offset(y: dynamicNotch.state == .expanded ? dynamicNotch.notchSize.height : -windowHeight)
+            .offset(y: dynamicNotch.state == .expanded ? dynamicNotch.notchSize.height : hiddenOffset)
             .onHover(perform: dynamicNotch.updateHoverState)
     }
 
