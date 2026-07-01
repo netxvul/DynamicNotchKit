@@ -28,7 +28,7 @@ struct NotchlessView<Expanded, CompactLeading, CompactTrailing>: View where Expa
         switch dynamicNotch.expandDirection {
         case .fromTop:    return -windowHeight
         case .fade:       return dynamicNotch.notchSize.height
-        case .fromBottom: return windowHeight
+        case .fromBottom: return dynamicNotch.notchSize.height
         }
     }
 
