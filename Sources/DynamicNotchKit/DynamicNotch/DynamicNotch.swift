@@ -75,6 +75,10 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     public enum ExpandDirection { case fromTop, fade, fromBottom }
     public var expandDirection: ExpandDirection = .fromTop
 
+    /// Floating-only shadow customization.
+    public var floatingShadowOpacity: CGFloat = 0
+    public var floatingShadowRadius: CGFloat = 0
+
     /// Optional custom panel origin Y. When set, overrides the default
     /// top-of-screen positioning in initializeWindow.
     public var customPanelOriginY: CGFloat? = nil
